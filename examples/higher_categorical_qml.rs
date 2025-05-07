@@ -1,12 +1,12 @@
-use categorical_qc::category::bicategory::{
+use shim::category::bicategory::{
     QuantumCircuitBicategory, CircuitTransformation,
     HigherCategoricalQuantumNN, QuantumNeuralLayer, HigherCategoricalQNN,
     Bicategory, Adjunction
 };
-use categorical_qc::machine_learning::loss::{LossFunction, MeanSquaredError};
-use categorical_qc::quantum::circuit::{QuantumCircuit, CircuitBuilder};
-use categorical_qc::quantum::state::StateVector;
-use categorical_qc::simulators::statevector::{StatevectorSimulator, Outcome};
+use shim::machine_learning::loss::{LossFunction, MeanSquaredError};
+use shim::quantum::circuit::{QuantumCircuit, CircuitBuilder};
+use shim::quantum::state::StateVector;
+use shim::simulators::statevector::{StatevectorSimulator, Outcome};
 use ndarray::Array1;
 use std::collections::HashMap;
 use std::f64::consts::PI;

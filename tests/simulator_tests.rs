@@ -2,9 +2,9 @@ use num_complex::Complex64;
 use ndarray::Array1;
 use std::f64::consts::PI;
 
-use categorical_qc::quantum::gate::{QuantumGate, StandardGate, ParametrizedGate};
-use categorical_qc::quantum::circuit::CircuitBuilder;
-use categorical_qc::simulators::{StatevectorSimulator, Outcome};
+use shim::quantum::gate::{QuantumGate, StandardGate, ParametrizedGate};
+use shim::quantum::circuit::CircuitBuilder;
+use shim::simulators::{StatevectorSimulator, Outcome};
 
 /// Helper function for comparing complex numbers with tolerance
 fn complex_approx_eq(a: Complex64, b: Complex64, epsilon: f64) -> bool {

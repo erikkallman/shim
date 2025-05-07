@@ -4,27 +4,27 @@
 use ndarray::{Array1, Array2};
 use std::f64::consts::PI;
 
-use categorical_qc::machine_learning::prelude::*;
-use categorical_qc::machine_learning::quantum::model::{
+use shim::machine_learning::prelude::*;
+use shim::machine_learning::quantum::model::{
     QuantumModel, EncodingStrategy, DecodingStrategy
 };
-use categorical_qc::machine_learning::quantum::circuit_model::{
+use shim::machine_learning::quantum::circuit_model::{
     ParametrizedCircuitModel, ParamGateType
 };
-use categorical_qc::machine_learning::quantum::variational::QuantumNeuralNetwork;
-use categorical_qc::machine_learning::quantum::kernel::QuantumKernel;
-use categorical_qc::machine_learning::categorical::categories::{
+use shim::machine_learning::quantum::variational::QuantumNeuralNetwork;
+use shim::machine_learning::quantum::kernel::QuantumKernel;
+use shim::machine_learning::categorical::categories::{
     ModelCategory, DataCategory, CircuitCategory
 };
-use categorical_qc::quantum::circuit::CircuitBuilder;
-use categorical_qc::quantum::state::StateVector;
-use categorical_qc::category::{Category, MonoidalCategory, Functor};
-use categorical_qc::machine_learning::categorical::categories::ModelDimension;
-use categorical_qc::quantum::QuantumState;
+use shim::quantum::circuit::CircuitBuilder;
+use shim::quantum::state::StateVector;
+use shim::category::{Category, MonoidalCategory, Functor};
+use shim::machine_learning::categorical::categories::ModelDimension;
+use shim::quantum::QuantumState;
 
-use categorical_qc::machine_learning::categorical::transformations::DataToModelFunctor;
-use categorical_qc::machine_learning::categorical::transformations::ModelPredictionTransformation;
-use categorical_qc::machine_learning::categorical::transformations::StatePreparationTransformation;
+use shim::machine_learning::categorical::transformations::DataToModelFunctor;
+use shim::machine_learning::categorical::transformations::ModelPredictionTransformation;
+use shim::machine_learning::categorical::transformations::StatePreparationTransformation;
 
 #[test]
 fn test_parametrized_circuit_model() {
@@ -45,7 +45,7 @@ fn test_parametrized_circuit_model() {
     model.add_parametrized_gate(ParamGateType::Rx, 0, 0).unwrap();
     model.add_parametrized_gate(ParamGateType::Ry, 1, 1).unwrap();
     model.circuit_mut().add_gate(
-        Box::new(categorical_qc::quantum::gate::StandardGate::CNOT),
+        Box::new(shim::quantum::gate::StandardGate::CNOT),
         &[0, 1]
     ).unwrap();
     model.add_parametrized_gate(ParamGateType::Rz, 0, 2).unwrap();
@@ -144,7 +144,7 @@ fn test_categorical_composition() {
 
     // Test DataToCircuitFunctor
     let encoding_strategy = EncodingStrategy::AngleEncoding;
-    let data_to_circuit = categorical_qc::machine_learning::categorical::functors::DataToCircuitFunctor::new(
+    let data_to_circuit = shim::machine_learning::categorical::functors::DataToCircuitFunctor::new(
         qubit_count,
         encoding_strategy
     );
@@ -328,11 +328,11 @@ fn test_quantum_model_training() {
     use ndarray::{Array1, Array2};
     use std::f64::consts::PI;
 
-    use categorical_qc::machine_learning::prelude::*;
-    use categorical_qc::machine_learning::quantum::model::QuantumModel;
-    use categorical_qc::machine_learning::quantum::circuit_model::ParametrizedCircuitModel;
-    use categorical_qc::machine_learning::optimizer::{Optimizer, GradientDescent};
-    use categorical_qc::machine_learning::loss::{LossFunction, BinaryCrossEntropy};
+    use shim::machine_learning::prelude::*;
+    use shim::machine_learning::quantum::model::QuantumModel;
+    use shim::machine_learning::quantum::circuit_model::ParametrizedCircuitModel;
+    use shim::machine_learning::optimizer::{Optimizer, GradientDescent};
+    use shim::machine_learning::loss::{LossFunction, BinaryCrossEntropy};
 
     // Create a binary classification dataset
     let x_train = Array2::from_shape_vec((10, 3), vec![
@@ -388,7 +388,7 @@ fn test_quantum_model_training() {
     model.add_parametrized_gate(ParamGateType::Rx, 0, 0).unwrap();
     model.add_parametrized_gate(ParamGateType::Ry, 1, 1).unwrap();
     model.circuit_mut().add_gate(
-        Box::new(categorical_qc::quantum::gate::StandardGate::CNOT),
+        Box::new(shim::quantum::gate::StandardGate::CNOT),
         &[0, 1]
     ).unwrap();
     model.add_parametrized_gate(ParamGateType::Rz, 0, 2).unwrap();
@@ -510,19 +510,19 @@ fn test_quantum_model_training() {
 // fn test_categorical_optimization() {
 //     use ndarray::{Array1, Array2};
 
-//     use categorical_qc::machine_learning::prelude::*;
-//     use categorical_qc::machine_learning::quantum::model::{
+//     use shim::machine_learning::prelude::*;
+//     use shim::machine_learning::quantum::model::{
 //         QuantumModel, EncodingStrategy, DecodingStrategy
 //     };
-//     use categorical_qc::machine_learning::quantum::circuit_model::{
+//     use shim::machine_learning::quantum::circuit_model::{
 //         ParametrizedCircuitModel, ParamGateType
 //     };
-//     use categorical_qc::machine_learning::optimizer::{Optimizer, Adam};
-//     use categorical_qc::machine_learning::loss::{LossFunction, BinaryCrossEntropy};
-//     use categorical_qc::machine_learning::categorical::categories::ModelCategory;
-//     use categorical_qc::machine_learning::optimizer::OptimizationCategory;
-//     use categorical_qc::machine_learning::categorical::GradientOptimizationTransformation;
-//     use categorical_qc::category::Category;
+//     use shim::machine_learning::optimizer::{Optimizer, Adam};
+//     use shim::machine_learning::loss::{LossFunction, BinaryCrossEntropy};
+//     use shim::machine_learning::categorical::categories::ModelCategory;
+//     use shim::machine_learning::optimizer::OptimizationCategory;
+//     use shim::machine_learning::categorical::GradientOptimizationTransformation;
+//     use shim::category::Category;
 
 //     // Create optimization category
 //     let opt_category = OptimizationCategory;
@@ -544,7 +544,7 @@ fn test_quantum_model_training() {
 //     model.add_parametrized_gate(ParamGateType::Rx, 0, 0).unwrap();
 //     model.add_parametrized_gate(ParamGateType::Ry, 1, 1).unwrap();
 //     model.circuit_mut().add_gate(
-//         Box::new(categorical_qc::quantum::gate::StandardGate::CNOT),
+//         Box::new(shim::quantum::gate::StandardGate::CNOT),
 //         &[0, 1]
 //     ).unwrap();
 //     model.add_parametrized_gate(ParamGateType::Rz, 0, 2).unwrap();
@@ -658,15 +658,15 @@ fn test_quantum_model_training() {
 //     use std::f64::consts::PI;
 //     use rand::Rng;
 
-//     use categorical_qc::machine_learning::prelude::*;
-//     use categorical_qc::machine_learning::quantum::model::{
+//     use shim::machine_learning::prelude::*;
+//     use shim::machine_learning::quantum::model::{
 //         QuantumModel, EncodingStrategy, DecodingStrategy
 //     };
-//     use categorical_qc::machine_learning::quantum::circuit_model::{
+//     use shim::machine_learning::quantum::circuit_model::{
 //         ParametrizedCircuitModel, ParamGateType
 //     };
-//     use categorical_qc::machine_learning::optimizer::{Optimizer, Adam, GradientDescent, SGDMomentum};
-//     use categorical_qc::machine_learning::loss::{LossFunction, BinaryCrossEntropy};
+//     use shim::machine_learning::optimizer::{Optimizer, Adam, GradientDescent, SGDMomentum};
+//     use shim::machine_learning::loss::{LossFunction, BinaryCrossEntropy};
 
 //     // Create a synthetic dataset
 //     let data_size = 100;
@@ -767,7 +767,7 @@ fn test_quantum_model_training() {
 //         model.add_parametrized_gate(ParamGateType::Rx, 0, 0).unwrap();
 //         model.add_parametrized_gate(ParamGateType::Ry, 1, 1).unwrap();
 //         model.circuit_mut().add_gate(
-//             Box::new(categorical_qc::quantum::gate::StandardGate::CNOT),
+//             Box::new(shim::quantum::gate::StandardGate::CNOT),
 //             &[0, 1]
 //         ).unwrap();
 //         model.add_parametrized_gate(ParamGateType::Rz, 0, 2).unwrap();
@@ -777,7 +777,7 @@ fn test_quantum_model_training() {
 //         model.add_parametrized_gate(ParamGateType::Rx, 0, 4).unwrap();
 //         model.add_parametrized_gate(ParamGateType::Ry, 1, 5).unwrap();
 //         model.circuit_mut().add_gate(
-//             Box::new(categorical_qc::quantum::gate::StandardGate::CNOT),
+//             Box::new(shim::quantum::gate::StandardGate::CNOT),
 //             &[1, 0]
 //         ).unwrap();
 //         model.add_parametrized_gate(ParamGateType::Rz, 0, 6).unwrap();
@@ -873,7 +873,7 @@ fn test_quantum_model_training() {
 //         println!("Fold {} Test Accuracy: {}", fold, accuracy);
 
 //         // Compare with a classical linear model as baseline
-//         let mut linear_model = categorical_qc::machine_learning::core::LinearModel::new(
+//         let mut linear_model = shim::machine_learning::core::LinearModel::new(
 //             features, output_dim
 //         );
 
@@ -969,7 +969,7 @@ fn test_quantum_model_training() {
 //         model.add_parametrized_gate(ParamGateType::Rx, 0, 0).unwrap();
 //         model.add_parametrized_gate(ParamGateType::Ry, 1, 1).unwrap();
 //         model.circuit_mut().add_gate(
-//             Box::new(categorical_qc::quantum::gate::StandardGate::CNOT),
+//             Box::new(shim::quantum::gate::StandardGate::CNOT),
 //             &[0, 1]
 //         ).unwrap();
 //         model.add_parametrized_gate(ParamGateType::Rz, 0, 2).unwrap();
@@ -977,7 +977,7 @@ fn test_quantum_model_training() {
 //         model.add_parametrized_gate(ParamGateType::Rx, 0, 4).unwrap();
 //         model.add_parametrized_gate(ParamGateType::Ry, 1, 5).unwrap();
 //         model.circuit_mut().add_gate(
-//             Box::new(categorical_qc::quantum::gate::StandardGate::CNOT),
+//             Box::new(shim::quantum::gate::StandardGate::CNOT),
 //             &[1, 0]
 //         ).unwrap();
 //         model.add_parametrized_gate(ParamGateType::Rz, 0, 6).unwrap();

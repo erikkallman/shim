@@ -1,16 +1,16 @@
-use categorical_qc::quantum::StandardGate;
-use categorical_qc::quantum::density_matrix::PureToDensityFunctor;
-use categorical_qc::quantum::density_matrix::DensityMatrixCategory;
-use categorical_qc::quantum::QuantumStateCategory;
-use categorical_qc::quantum::StateVector;
+use shim::quantum::StandardGate;
+use shim::quantum::density_matrix::PureToDensityFunctor;
+use shim::quantum::density_matrix::DensityMatrixCategory;
+use shim::quantum::QuantumStateCategory;
+use shim::quantum::StateVector;
 use num_complex::Complex64;
 use ndarray::Array1;
-use categorical_qc::category::Functor;
-use categorical_qc::quantum::QuantumGate;
-use categorical_qc::quantum::QuantumState;
-use categorical_qc::category::MonoidalCategory;
-use categorical_qc::category::Category;
-use categorical_qc::quantum::DensityMatrix;
+use shim::category::Functor;
+use shim::quantum::QuantumGate;
+use shim::quantum::QuantumState;
+use shim::category::MonoidalCategory;
+use shim::category::Category;
+use shim::quantum::DensityMatrix;
 
 /// Helper function for comparing complex numbers with tolerance
 fn complex_approx_eq(a: Complex64, b: Complex64, epsilon: f64) -> bool {

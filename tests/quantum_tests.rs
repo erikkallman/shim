@@ -6,14 +6,14 @@ mod tests {
     use ndarray::{Array1, Array2};
     use std::f64::consts::PI;
 
-    use categorical_qc::quantum::prelude::*;
-    use categorical_qc::quantum::state::{QuantumState, StateVector, Qubit, QuantumStateCategory};
-    use categorical_qc::quantum::gate::*;
-    use categorical_qc::quantum::*;
-    use categorical_qc::quantum::gate_operations::gate_operations;
-    use categorical_qc::quantum::circuit::{QuantumCircuit, CircuitBuilder};
-    use categorical_qc::category::prelude::*;
-    use categorical_qc::quantum::optimizer::*;
+    use shim::quantum::prelude::*;
+    use shim::quantum::state::{QuantumState, StateVector, Qubit, QuantumStateCategory};
+    use shim::quantum::gate::*;
+    use shim::quantum::*;
+    use shim::quantum::gate_operations::gate_operations;
+    use shim::quantum::circuit::{QuantumCircuit, CircuitBuilder};
+    use shim::category::prelude::*;
+    use shim::quantum::optimizer::*;
     /// Helper function for comparing complex numbers with tolerance
     fn complex_approx_eq(a: Complex64, b: Complex64, epsilon: f64) -> bool {
         (a - b).norm() < epsilon

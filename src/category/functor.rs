@@ -18,22 +18,22 @@ pub trait Functor<C: Category, D: Category> {
 
     /// Map a morphism from category C to category D
     fn map_morphism(&self, c: &C, d: &D, f: &C::Morphism) -> D::Morphism;
-    
+
     /// Check if the functor properly maps domains
     fn preserves_domain(&self, c: &C, d: &D, f: &C::Morphism) -> bool {
         let c_domain = c.domain(f);
         let d_domain = d.domain(&self.map_morphism(c, d, f));
         let mapped_c_domain = self.map_object(c, d, &c_domain);
-        
+
         mapped_c_domain == d_domain
     }
-    
+
     /// Check if the functor properly maps codomains
     fn preserves_codomain(&self, c: &C, d: &D, f: &C::Morphism) -> bool {
         let c_codomain = c.codomain(f);
         let d_codomain = d.codomain(&self.map_morphism(c, d, f));
         let mapped_c_codomain = self.map_object(c, d, &c_codomain);
-        
+
         mapped_c_codomain == d_codomain
     }
 
@@ -60,20 +60,20 @@ pub trait Functor<C: Category, D: Category> {
         if !c.can_compose(f, g) {
             return true; // vacuously true
         }
-        
+
         // Compute F(g ∘ f)
         if let Some(comp_fg) = c.compose(f, g) {
             let mapped_comp = self.map_morphism(c, d, &comp_fg);
-            
+
             // Compute F(g) ∘ F(f)
             let mapped_f = self.map_morphism(c, d, f);
             let mapped_g = self.map_morphism(c, d, g);
-            
+
             // Check that mapped_f and mapped_g can be composed in category D
             if !d.can_compose(&mapped_f, &mapped_g) {
                 return false; // Functor failed to preserve composability
             }
-            
+
             if let Some(comp_mapped) = d.compose(&mapped_f, &mapped_g) {
                 // Compare F(g ∘ f) with F(g) ∘ F(f)
                 mapped_comp == comp_mapped
@@ -85,41 +85,41 @@ pub trait Functor<C: Category, D: Category> {
             false
         }
     }
-    
+
     /// Verify all functor laws at once for a collection of test objects and morphisms
     fn verify_functor_laws(
-        &self, 
-        c: &C, 
-        d: &D, 
+        &self,
+        c: &C,
+        d: &D,
         test_objects: &[C::Object],
         test_morphisms: &[C::Morphism]
     ) -> bool {
         // 1. Check identity preservation for all test objects
-        let identity_preservation = test_objects.iter().all(|obj| 
+        let identity_preservation = test_objects.iter().all(|obj|
             self.preserves_identity(c, d, obj)
         );
-        
+
         // 2. Check composition preservation for all valid pairs of test morphisms
         let mut composition_preservation = true;
         for f in test_morphisms.iter() {
             for g in test_morphisms.iter() {
                 if c.can_compose(f, g) {
-                    composition_preservation = composition_preservation && 
+                    composition_preservation = composition_preservation &&
                         self.preserves_composition(c, d, f, g);
                 }
             }
         }
-        
+
         // 3. Check domain and codomain preservation
-        let domain_preservation = test_morphisms.iter().all(|f| 
+        let domain_preservation = test_morphisms.iter().all(|f|
             self.preserves_domain(c, d, f)
         );
-        
-        let codomain_preservation = test_morphisms.iter().all(|f| 
+
+        let codomain_preservation = test_morphisms.iter().all(|f|
             self.preserves_codomain(c, d, f)
         );
-        
-        identity_preservation && composition_preservation && 
+
+        identity_preservation && composition_preservation &&
         domain_preservation && codomain_preservation
     }
 }
@@ -189,7 +189,7 @@ where
         let eta_a_codomain_ok = d.codomain(&eta_a) == ga;
         let eta_b_domain_ok = d.domain(&eta_b) == fb;
         let eta_b_codomain_ok = d.codomain(&eta_b) == gb;
-        
+
         if !eta_a_domain_ok || !eta_a_codomain_ok || !eta_b_domain_ok || !eta_b_codomain_ok {
             return false;
         }
@@ -201,11 +201,11 @@ where
                 return lhs == rhs;
             }
         }
-        
+
         // If we can't compose, there's a problem with the naturality condition
         false
     }
-    
+
     /// Verify the naturality condition for all morphisms in a test set
     fn verify_naturality(
         &self,
@@ -219,7 +219,7 @@ where
             self.is_natural(c, d, f, g, morphism)
         })
     }
-    
+
     /// Verify that the components have the correct domains and codomains
     fn has_valid_components(
         &self,
@@ -233,7 +233,7 @@ where
             let fa = f.map_object(c, d, obj);
             let ga = g.map_object(c, d, obj);
             let eta = self.component(c, d, f, g, obj);
-            
+
             d.domain(&eta) == fa && d.codomain(&eta) == ga
         })
     }

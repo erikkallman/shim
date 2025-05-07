@@ -3,8 +3,8 @@ mod tests {
     use std::fmt::Debug;
 
     // Import the category theory module
-    use categorical_qc::category::prelude::*;
-    use categorical_qc::category::{Functor, Monad};
+    use shim::category::prelude::*;
+    use shim::category::{Functor, Monad};
 
     // Define a simple set category for testing
     #[derive(Debug)]

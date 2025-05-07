@@ -1,15 +1,17 @@
-use categorical_qc::quantum::gate::constants;
+use shim::quantum::gate::constants;
 use num_complex::Complex64;
-use categorical_qc::quantum::gate::*;
-use categorical_qc::category::MonoidalCategory;
-use categorical_qc::category::Category;
-use categorical_qc::category::Functor;
-use categorical_qc::category::SymmetricMonoidalCategory;
+use shim::quantum::gate::*;
+use shim::category::MonoidalCategory;
+use shim::category::Category;
+use shim::category::Functor;
+use shim::category::SymmetricMonoidalCategory;
 use ndarray::Array2;
-use categorical_qc::quantum::QuantumCircuitCategory;
-use categorical_qc::quantum::StateVector;
-use categorical_qc::quantum::GateToCircuitFunctor;
-use categorical_qc::quantum::CircuitToGateFunctor;
+use shim::quantum::QuantumCircuitCategory;
+use shim::quantum::StateVector;
+use shim::quantum::GateToCircuitFunctor;
+use shim::quantum::CircuitToGateFunctor;
+use shim::quantum::QuantumGate;
+use shim::quantum::StandardGate;
 
 #[cfg(test)]
 mod categorical_gate_tests {

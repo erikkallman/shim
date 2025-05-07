@@ -1,11 +1,11 @@
-use categorical_qc::category::examples::{
+use shim::category::examples::{
     FinSet, FiniteSet, SetFunction, PowerSetFunctor, ListMonad, demonstrate_category_laws
 };
-use categorical_qc::category::laws::{
+use shim::category::laws::{
     verify_category_laws, verify_monoidal_laws,
     verify_symmetric_monoidal_laws, verify_braiding_naturality
 };
-use categorical_qc::category::{
+use shim::category::{
     Category, MonoidalCategory,
     Functor, Monad
 };
