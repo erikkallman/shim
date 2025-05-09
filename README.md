@@ -7,11 +7,13 @@ quantum operations and data transformations.
 
 ## Features
 
-- **Category Theory Foundations**: Implementation of category theory primitives including categories, functors, monads, and bicategories
+- **Category Theory Foundations**: Implementation of category theory primitives including categories, functors, monads, natural transformations, and bicategories
 - **Quantum Circuit Simulation**: Tools for building and simulating quantum circuits
 - **Categorical Quantum ML**: Models quantum machine learning as composition of categorical structures
 - **Higher-Order Transformations**: Represents parameter updates and gradients as 2-morphisms in bicategories
-- **ZX-Calculus**: Support for reasoning about quantum operations using ZX-diagrams (skeleton implementation)
+- **Natural Transformations Framework**: System for implementing and composing quantum circuit transformations like optimization, error correction, and noise simulation
+- **Dagger Compact Closed Categories**: Support for quantum teleportation and entanglement swapping through categorical structure
+- **ZX-Calculus**: Support for reasoning about quantum operations using ZX-diagrams
 
 ## Current State of Development
 
@@ -55,6 +57,15 @@ Explores how higher category theory can formalize quantum machine learning:
 - Formalizing backpropagation using vertical and horizontal composition
 - Demonstrating whiskers for gradient propagation through layers
 
+### Quantum Transformations (`examples/quantum_transformations.rs`)
+
+Demonstrates the natural transformation framework for quantum circuits:
+
+- Creating and applying circuit transformations including optimization, error detection, and ZX calculus
+- Composing transformations to create complex circuit manipulation pipelines
+- Implementing quantum teleportation with error protection
+- Verifying naturality conditions for quantum transformations
+
 ## Getting Started
 
 To use Shim in your project, add it to your `Cargo.toml`:
@@ -88,6 +99,7 @@ Run examples:
 cargo run --example categorical_quantum_ml_showcase
 cargo run --example categorical_verification
 cargo run --example higher_categorical_qml
+cargo run --example quantum_transformations
 ```
 
 Run tests:
