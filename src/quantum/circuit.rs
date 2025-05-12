@@ -7,6 +7,7 @@ use crate::category::prelude::*;
 use crate::quantum::gate_operations::{gate_operations::CategoryAware, gate_operations};
 use crate::quantum::gate::ComposedGate;
 use crate::quantum::gate::QuantumGateCategory;
+
 /// A quantum circuit consisting of a sequence of gates
 #[derive(Debug)]
 pub struct QuantumCircuit {
@@ -39,7 +40,6 @@ impl Category for QuantumCircuitCategory {
         }
     }
 }
-
 
 impl QuantumCircuit {
     /// Create a new empty quantum circuit
@@ -199,7 +199,72 @@ impl QuantumCircuit {
 
         result
     }
+    /// Convert this circuit to a morphism in the quantum state category
+    pub fn to_state_morphism(&self) -> <QuantumStateCategory as Category>::Morphism {
+        let category = QuantumStateCategory;
+        category.circuit_to_morphism(self)
+    }
 
+    /// Implement quantum teleportation using the compact closed structure
+    pub fn teleport(&self, state_circuit: &QuantumCircuit) -> Result<QuantumCircuit, String> {
+        if state_circuit.qubit_count != 1 {
+            return Err("Teleportation requires a single-qubit state".to_string());
+        }
+
+        let cat = QuantumCircuitCategory;
+
+        // Create an entangled Bell pair
+        let bell_pair = cat.unit_morphism(&1);
+
+        // Tensor the state with the first qubit of the Bell pair
+        let state_and_bell = state_circuit.tensor(&bell_pair)?;
+
+        // Perform Bell measurement on the state and first Bell qubit
+        let _bell_measurement = cat.counit_morphism(&1);
+
+        // Need to reorder qubits to apply Bell measurement to the right qubits
+        let mut measurement_circuit = QuantumCircuit::new(3);
+        // Apply CNOT with control on state qubit, target on first Bell qubit
+        measurement_circuit.add_gate(Box::new(StandardGate::CNOT), &[0, 1])?;
+        // Apply Hadamard to state qubit
+        measurement_circuit.add_gate(Box::new(StandardGate::H), &[0])?;
+
+        // Compose: first prepare state and Bell pair, then measure
+        let teleported = measurement_circuit.compose(&state_and_bell)?;
+
+        // The third qubit now contains the teleported state (up to corrections)
+        // For a complete teleportation protocol, classical communication and
+        // corrections would follow but for now lets just..
+        Ok(teleported)
+    }
+
+    /// Implement entanglement swapping using the compact closed structure
+    pub fn entanglement_swap(a_entangled: &QuantumCircuit, b_entangled: &QuantumCircuit) -> Result<QuantumCircuit, String> {
+        if a_entangled.qubit_count != 2 || b_entangled.qubit_count != 2 {
+            return Err("Entanglement swapping requires two-qubit entangled states".to_string());
+        }
+
+        let cat = QuantumCircuitCategory;
+
+        // Tensor the two entangled states
+        let combined = a_entangled.tensor(b_entangled)?;
+
+        // Perform Bell measurement on the middle two qubits (1 and 2)
+        let _bell_measurement = cat.counit_morphism(&1);
+
+        // Need to apply the measurement to the right qubits
+        let mut measurement_circuit = QuantumCircuit::new(4);
+        // Apply CNOT with control on qubit 1, target on qubit 2
+        measurement_circuit.add_gate(Box::new(StandardGate::CNOT), &[1, 2])?;
+        // Apply Hadamard to qubit 1
+        measurement_circuit.add_gate(Box::new(StandardGate::H), &[1])?;
+
+        // Compose the circuits
+        let swapped = measurement_circuit.compose(&combined)?;
+
+        // Qubits 0 and 3 are now entangled, despite never having interacted directly
+        Ok(swapped)
+    }
 }
 
 impl PartialEq for QuantumCircuit {
@@ -326,74 +391,6 @@ impl CompactClosedCategory for QuantumCircuitCategory {
 
 impl DaggerCompactCategory for QuantumCircuitCategory {}
 
-impl QuantumCircuit {
-    /// Convert this circuit to a morphism in the quantum state category
-    pub fn to_state_morphism(&self) -> <QuantumStateCategory as Category>::Morphism {
-        let category = QuantumStateCategory;
-        category.circuit_to_morphism(self)
-    }
-
-    /// Implement quantum teleportation using the compact closed structure
-    pub fn teleport(&self, state_circuit: &QuantumCircuit) -> Result<QuantumCircuit, String> {
-        if state_circuit.qubit_count != 1 {
-            return Err("Teleportation requires a single-qubit state".to_string());
-        }
-
-        let cat = QuantumCircuitCategory;
-
-        // Create an entangled Bell pair
-        let bell_pair = cat.unit_morphism(&1);
-
-        // Tensor the state with the first qubit of the Bell pair
-        let state_and_bell = state_circuit.tensor(&bell_pair)?;
-
-        // Perform Bell measurement on the state and first Bell qubit
-        let _bell_measurement = cat.counit_morphism(&1);
-
-        // Need to reorder qubits to apply Bell measurement to the right qubits
-        let mut measurement_circuit = QuantumCircuit::new(3);
-        // Apply CNOT with control on state qubit, target on first Bell qubit
-        measurement_circuit.add_gate(Box::new(StandardGate::CNOT), &[0, 1])?;
-        // Apply Hadamard to state qubit
-        measurement_circuit.add_gate(Box::new(StandardGate::H), &[0])?;
-
-        // Compose: first prepare state and Bell pair, then measure
-        let teleported = measurement_circuit.compose(&state_and_bell)?;
-
-        // The third qubit now contains the teleported state (up to corrections)
-        // For a complete teleportation protocol, classical communication and
-        // corrections would follow but for now lets just..
-        Ok(teleported)
-    }
-
-    /// Implement entanglement swapping using the compact closed structure
-    pub fn entanglement_swap(a_entangled: &QuantumCircuit, b_entangled: &QuantumCircuit) -> Result<QuantumCircuit, String> {
-        if a_entangled.qubit_count != 2 || b_entangled.qubit_count != 2 {
-            return Err("Entanglement swapping requires two-qubit entangled states".to_string());
-        }
-
-        let cat = QuantumCircuitCategory;
-
-        // Tensor the two entangled states
-        let combined = a_entangled.tensor(b_entangled)?;
-
-        // Perform Bell measurement on the middle two qubits (1 and 2)
-        let _bell_measurement = cat.counit_morphism(&1);
-
-        // Need to apply the measurement to the right qubits
-        let mut measurement_circuit = QuantumCircuit::new(4);
-        // Apply CNOT with control on qubit 1, target on qubit 2
-        measurement_circuit.add_gate(Box::new(StandardGate::CNOT), &[1, 2])?;
-        // Apply Hadamard to qubit 1
-        measurement_circuit.add_gate(Box::new(StandardGate::H), &[1])?;
-
-        // Compose the circuits
-        let swapped = measurement_circuit.compose(&combined)?;
-
-        // Qubits 0 and 3 are now entangled, despite never having interacted directly
-        Ok(swapped)
-    }
-}
 
 /// A builder for quantum circuits
 pub struct CircuitBuilder {

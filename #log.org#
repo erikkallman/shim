@@ -1,0 +1,324 @@
+* Fri May 09 11:06:03 CEST 2025
+
+So the entire implementation rests on te matrix representation of gates
+
+#[derive(Debug, Clone)]
+pub struct CustomMatrixGate {
+    pub matrix: Array2<Complex64>,
+    pub name: String,
+    pub qubits: usize,
+}
+
+
+** !! Verify the correct use of endofunctors here.
+
+quantum gates and unitary transformations are not endofunctors.
+
+They are morphisms in the category of symmetric monoidal category H whos objects
+are Hilbert spaces representing state spaces of quatnum systems (in turn
+represented as vectors)
+
+I ran:
+
+grep -r "Endofunctor" ./src/
+./src//category/monad.rs:use super::{Category, Functor, Endofunctor};
+./src//category/monad.rs:pub trait Monad<C: Category>: Endofunctor<C> {
+./src//category/functor.rs:/// Endofunctors are particularly important for defining monads.
+./src//category/functor.rs:pub trait Endofunctor<C: Category>: Functor<C, C> {}
+./src//category/functor.rs:impl<T, C: Category> Endofunctor<C> for T where T: Functor<C, C> {}
+./src//category/mod.rs:    Functor, NaturalTransformation, Endofunctor,
+./src//category/mod.rs:        Functor, NaturalTransformation, Endofunctor,
+./src//simulators/statevector.rs:use crate::quantum::optimizer::OptimizationEndofunctor;
+./src//simulators/statevector.rs:        let optimization_endofunctor = OptimizationEndofunctor::new(
+./src//quantum/mod.rs:pub use optimizer::{CircuitOptimizer, OptimizationEndofunctor};
+./src//quantum/optimizer.rs:pub struct OptimizationEndofunctor {
+./src//quantum/optimizer.rs:impl OptimizationEndofunctor {
+./src//quantum/optimizer.rs:        OptimizationEndofunctor { optimizer }
+./src//quantum/optimizer.rs:impl Functor<QuantumGateCategory, QuantumGateCategory> for OptimizationEndofunctor {
+
+Lots of stuff in monad.rs that im not using that is completely outdated.
+
+What im doing in circuit is considering quantum circuits as monoidal, symmetric, compact closed dagger categories.
+
+I need to elaborate more on the categorical side of the quantum builder.lo
+
+* Mon May 05 15:54:47 CEST 2025
+
+The code demonstrates applying higher category theory (specifically bicategories) to quantum machine learning. While theoretically interesting, it has several limitations:
+
+  1. The implementation is largely symbolic - the backward circuit is just a simplistic transpose rather than proper gradient computation.
+  2. The "adjunction" properties are verified but not rigorously proven to hold in quantum settings.
+  3. The 2-morphism representations of parameter updates and gradients are conceptually elegant but lack mathematical justification for how they correspond to actual gradient descent in Hilbert space.
+  4. The bicategorical operations (vertical/horizontal composition, whiskering) are demonstrated but their equivalence to standard backpropagation isn't established.
+
+* Mon Apr 14 14:04:04 CEST 2025
+
+Based on my analysis of the codebase, I can identify several points where the code doesn't map well to the idea of using category theory to create a quantum computation
+   framework for quantum machine learning:
+
+  1. Incomplete Categorical Implementation:
+    - While the code defines categorical structures like Category, MonoidalCategory, and SymmetricMonoidalCategory, the implementation of key laws and properties is often
+   incomplete (marked with // In a proper implementation...) or simplified (e.g., the verification functions in laws module).
+    - Many of the category theory laws are only partially verified or commented as placeholders, like in verify_monoidal_laws which simply returns true.
+  2. Inconsistent Application of Category Theory:
+    - The quantum circuits and gates have categorical implementations (QuantumCircuitCategory, QuantumGateCategory), but the machine learning models don't consistently
+  use the categorical structure.
+    - There's a disconnect between the theoretical category structure and its practical application in the quantum ML components.
+  3. Functors and Natural Transformations:
+    - The functors between categories (like CircuitToGateFunctor) are defined but don't fully leverage the mathematical properties that make category theory powerful.
+    - Natural transformations aren't thoroughly used to map between different functorial representations of quantum processes.
+  4. Problematic Categorical Composition:
+    - In test_categorical_optimization, the composition relies on standard Rust traits rather than using the categorical composition rules that should govern the system.
+    - The tensor product operations in circuits and models (like in tensor_quantum_models) are not consistently implemented through the categorical framework.
+  5. Incomplete Monoidal Structure:
+    - The monoidal structure of quantum gates and circuits is simplified, with methods like associator, left_unitor, and right_unitor in QuantumCircuitCategory just
+  returning identity rather than proper isomorphisms.
+  6. Type Safety Issues:
+    - The Clone implementation for EncodingStrategy and DecodingStrategy has to use fallback strategies because custom closures can't be cloned, breaking the categorical
+  property requirements.
+    - In quantum ML models, error handling often bypasses the categorical structure instead of making it part of the design.
+  7. Unimplemented Features:
+    - The tensor_quantum_models function is left unimplemented, returning a placeholder error, showing the categorical tensor product structure isn't completely realized.
+    - Several comments indicate missing implementations with notes like "// Placeholder for now" or "// In a proper test, we'd verify...".
+  8. Ad-hoc Implementations Over Categorical Structure:
+    - The gradient computation in ML tests uses direct finite differences rather than leveraging categorical differential structures.
+    - The optimization process in tests often falls back to imperative programming rather than using the categorical optimization transformations.
+  9. Disconnect Between Theory and Implementation:
+    - While the category module defines structures like DaggerCompactCategory that would be ideal for quantum computations, the actual quantum computing implementations
+  don't fully utilize these structures.
+    - The statevector simulations don't fully leverage the categorical framework that would make compositional reasoning more natural.
+  10. Missing Coherence Conditions:
+    - The coherence conditions required for monoidal categories (e.g., pentagon and triangle identities) are not verified or enforced in the implementation.
+    - This leads to potential inconsistencies when composing complex quantum operations.
+
+  The codebase shows a strong theoretical foundation in category theory and quantum computing but struggles to fully integrate these concepts into a coherent, practical
+  framework for quantum machine learning. The categorical abstractions often remain at the theoretical level without complete practical implementations, creating a gap
+  between the mathematical foundations and the actual quantum ML applications.
+
+
+
+** Elaboration on point 1:
+
+⏺ Based on my analysis of the code, here's how the categorical implementation has evolved and what we can still improve:
+
+  Evolution of the Categorical Implementation
+
+  1. The categorical foundation has been significantly strengthened:
+    - The Category trait now properly requires PartialEq for morphisms, enabling law verification
+    - We've implemented comprehensive law verification functions for various categorical structures
+    - The LawVerifier provides a unified interface for verifying different categorical laws
+  2. Law verification is now more rigorous:
+    - We now have proper implementations of category law verification, including identity laws and associativity
+    - Monoidal category laws include checks for the unit laws, associativity laws, and triangle identity
+    - Symmetric monoidal category laws include checking the symmetry property
+    - Compact closed category laws include verification of the snake equations
+    - Dagger category laws include tests for the involutive and contravariant properties
+  3. The showcase demonstrates some categorical principles:
+    - It verifies the identity law for the CircuitCategory
+    - It checks a basic functorial property (preserving objects)
+    - It demonstrates categorical composition in the QML pipeline
+
+  Areas Still Needing Improvement
+
+  Despite these improvements, there are still important aspects to address:
+
+  1. Incomplete Verification in Practice:
+    - Our showcase only uses a small subset of the available verification functions
+    - Many laws are verified only at a basic level, not comprehensively
+    - The Pentagon identity for monoidal categories isn't fully implemented
+  2. Limited Test Data:
+    - We need more comprehensive test objects and morphisms to properly verify laws
+    - Current verification is often superficial, checking only a few examples
+  3. Missing Verification of Advanced Structures:
+    - We're not verifying symmetric monoidal category laws in the showcase
+    - Compact closed and dagger category laws aren't being verified
+    - Natural transformation laws aren't thoroughly checked
+  4. Incomplete Demonstration of Categorical Reasoning:
+    - The showcase doesn't fully leverage the categorical structure for problem-solving
+    - We're not explicitly using the laws to derive properties or optimize computations
+
+  Proposed Improvements
+
+  Here's what we can do to address the remaining issues:
+
+  1. Enhance the Law Verification in the Showcase:
+    - Create a more comprehensive verification section that tests all relevant laws
+    - Generate appropriate test objects and morphisms for each category type
+    - Implement all the missing law verifications (like the pentagon identity)
+  2. Demonstrate Categorical Reasoning More Explicitly:
+    - Show how category laws enable formal reasoning about quantum circuit equivalence
+    - Demonstrate optimization techniques based on categorical principles
+    - Show how functorial properties can be used to reason about the entire pipeline
+  3. Improve the Implementation of Advanced Laws:
+    - Complete the implementation of pentagon identity verification
+    - Add comprehensive verification for natural transformations
+    - Implement thorough tests for coherence conditions in monoidal categories
+  4. Create Concrete Examples of Using Laws:
+    - Demonstrate circuit optimization based on categorical laws
+    - Show how tensor product structures relate to quantum entanglement
+    - Illustrate how functors preserve key properties across different domains
+  5. Add Explanatory Comments:
+    - Provide clear mathematical explanations of each law
+    - Explain how the categorical structure maps to quantum computing concepts
+    - Document the connection between category theory and quantum machine learning
+
+  Let me know if you'd like me to implement any of these improvements specifically for your showcase example.
+
+** categorical and category, base vs machine learning code
+
+if we compare
+
+categorical-qc/src/machine_learning/categorical
+
+categorical-qc/src/category
+
+Are there opportunities for refactoring?
+
+Does one use the other and if not, why?
+
+* Wed Apr 09 08:30:02 CEST 2025
+
+Large inconsitencies between the two QuantumModelTransformation implementations.
+
+Also there are large numbers of transformations implemented in the categories.rs file. Not optimal.
+
+grep -r "ModelTransformation" ./src/
+./src//machine_learning/categorical/categories.rs:pub trait ModelTransformation: Send + Sync + Debug {
+./src//machine_learning/categorical/categories.rs:    fn clone_box(&self) -> Box<dyn ModelTransformation>;
+./src//machine_learning/categorical/categories.rs:// Add this implementation to allow Clone for Box<dyn ModelTransformation>
+./src//machine_learning/categorical/categories.rs:impl Clone for Box<dyn ModelTransformation> {
+./src//machine_learning/categorical/categories.rs:    type Morphism = Box<dyn ModelTransformation>;
+./src//machine_learning/categorical/categories.rs:impl ModelTransformation for IdentityTransformation {
+./src//machine_learning/categorical/categories.rs:    fn clone_box(&self) -> Box<dyn ModelTransformation> {
+./src//machine_learning/categorical/categories.rs:    first: Box<dyn ModelTransformation>,
+./src//machine_learning/categorical/categories.rs:    second: Box<dyn ModelTransformation>,
+./src//machine_learning/categorical/categories.rs:impl ModelTransformation for ComposedTransformation {
+./src//machine_learning/categorical/categories.rs:    fn clone_box(&self) -> Box<dyn ModelTransformation> {
+./src//machine_learning/categorical/categories.rs:    first: Box<dyn ModelTransformation>,
+./src//machine_learning/categorical/categories.rs:    second: Box<dyn ModelTransformation>,
+./src//machine_learning/categorical/categories.rs:impl ModelTransformation for TensorProductTransformation {
+./src//machine_learning/categorical/categories.rs:    fn clone_box(&self) -> Box<dyn ModelTransformation> {
+./src//machine_learning/categorical/categories.rs:impl ModelTransformation for LeftUnitorTransformation {
+./src//machine_learning/categorical/categories.rs:    fn clone_box(&self) -> Box<dyn ModelTransformation> {
+./src//machine_learning/categorical/categories.rs:impl ModelTransformation for RightUnitorTransformation {
+./src//machine_learning/categorical/categories.rs:    fn clone_box(&self) -> Box<dyn ModelTransformation> {
+./src//machine_learning/categorical/categories.rs:impl ModelTransformation for AssociatorTransformation {
+./src//machine_learning/categorical/categories.rs:    fn clone_box(&self) -> Box<dyn ModelTransformation> {
+./src//machine_learning/categorical/categories.rs:impl ModelTransformation for BraidingTransformation {
+./src//machine_learning/categorical/categories.rs:    fn clone_box(&self) -> Box<dyn ModelTransformation> {
+./src//machine_learning/categorical/functors.rs:        Box::new(CircuitModelTransformation {
+./src//machine_learning/categorical/functors.rs:struct CircuitModelTransformation {
+./src//machine_learning/categorical/functors.rs:impl super::categories::ModelTransformation for CircuitModelTransformation {
+./src//machine_learning/categorical/functors.rs:    fn clone_box(&self) -> Box<dyn super::categories::ModelTransformation> {
+./src//machine_learning/categorical/functors.rs:    inner: Box<dyn super::categories::ModelTransformation>,
+./src//machine_learning/categorical/functors.rs:impl super::categories::ModelTransformation for QuantumWrappedTransformation {
+./src//machine_learning/categorical/functors.rs:    fn clone_box(&self) -> Box<dyn super::categories::ModelTransformation> {
+./src//machine_learning/categorical/transformations.rs:use crate::machine_learning::categorical::categories::ModelTransformation;
+./src//machine_learning/categorical/transformations.rs:pub struct QuantumModelTransformation<E> {
+./src//machine_learning/categorical/transformations.rs:impl<E> QuantumModelTransformation<E> {
+./src//machine_learning/categorical/transformations.rs:        QuantumModelTransformation {
+./src//machine_learning/categorical/transformations.rs:    pub fn transform_morphism(&self, f: &Array2<f64>) -> Box<dyn ModelTransformation> {
+./src//machine_learning/categorical/transformations.rs:pub struct QuantumModelTransformation<M: QuantumModel> {
+./src//machine_learning/categorical/transformations.rs:impl<M: QuantumModel> QuantumModelTransformation<M> {
+./src//machine_learning/categorical/transformations.rs:        QuantumModelTransformation {
+./src//machine_learning/categorical/transformations.rs:impl<M: QuantumModel + std::fmt::Debug + PredictiveModel> super::categories::ModelTransformation for QuantumModelTransformation<M>
+./src//machine_learning/categorical/transformations.rs:    fn clone_box(&self) -> Box<dyn super::categories::ModelTransformation> {
+
+So there seems to be a bunch of code using the underlying ModelTransformation.
+
+Step 1 here is understanding the idea behind the ModelTransformation, how it was then baked in to the quantum model transformation, and then how that idea is different from the latest implementation.
+
+
+
+
+2. Implement Natural Transformations
+Natural transformations are morphisms between functors that preserve the categorical structure. You could implement them for transformations like:
+rustCopypub struct StateToMeasurementTransformation;
+
+impl NaturalTransformation<StateVectorFunctor, MeasurementFunctor> for StateToMeasurementTransformation {
+    fn transform_object(&self, obj: &usize) -> /* measurement object */ {
+        // Implementation...
+    }
+
+    fn transform_morphism(&self, f: &StateVector, obj: &usize) -> /* measurement morphism */ {
+        // Implementation...
+    }
+}
+
+
+
+categorical-qml/
+├── Cargo.toml
+├── README.md
+├── examples/
+│   ├── quantum_neural_network.rs
+│   ├── variational_classifier.rs
+│   └── quantum_autoencoder.rs
+├── benches/
+│   └── circuit_optimization_benchmarks.rs
+└── src/
+    ├── lib.rs
+    ├── category/
+    │   ├── mod.rs
+    │   ├── monoidal.rs
+    │   ├── functor.rs
+    │   └── monad.rs
+    ├── quantum/
+    │   ├── mod.rs
+    │   ├── state.rs
+    │   ├── gate.rs
+    │   └── circuit.rs
+    ├── linear_algebra/
+    │   ├── mod.rs
+    │   ├── vector.rs
+    │   ├── matrix.rs
+    │   └── tensor.rs
+    ├── optimization/
+    │   ├── mod.rs
+    │   ├── gradient.rs
+    │   └── parameter_shift.rs
+    ├── machine_learning/
+    │   ├── mod.rs
+    │   ├── model.rs
+    │   ├── layer.rs
+    │   ├── loss.rs
+    │   └── training.rs
+    ├── simulators/
+    │   ├── mod.rs
+    │   ├── statevector.rs
+    │   └── density_matrix.rs
+    └── zx_calculus/
+        ├── mod.rs
+        ├── diagram.rs
+        └── rewrite_rules.rs
+
+
+* ideas
+
+Alternatively, you could change your CircuitBuilder implementation to return a new builder from each method instead of a mutable reference. This would allow the chaining pattern to work with the consuming build() method at the end:
+
+
+
+suggested structure:
+
+src/machine_learning/
+├── mod.rs                       # Main module declarations and exports
+├── core.rs                      # Core ML traits (Model, PredictiveModel, etc.)
+├── loss.rs                      # Loss function implementations
+├── optimizer.rs                 # Optimization algorithms
+├── dataset.rs                   # Dataset handling (already exists)
+├── quantum/                     # Quantum ML submodule
+│   ├── mod.rs                   # Quantum ML exports
+│   ├── model.rs                 # Quantum model trait and common implementations
+│   ├── circuit_model.rs         # Circuit-based quantum models
+│   ├── variational.rs           # Variational quantum models
+│   └── kernel.rs                # Quantum kernel methods
+└── categorical/                 # Categorical ML integration
+    ├── mod.rs                   # Categorical ML exports
+    ├── categories.rs            # Category definitions for ML domains
+    ├── functors.rs              # Functors between ML and quantum domains
+    └── transformations.rs       # Natural transformations for training
+
+* quest IS submission
+
+https://conference-questis.org/quest-is-2025/authors/authors-instructions/
