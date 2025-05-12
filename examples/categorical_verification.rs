@@ -6,8 +6,9 @@ use shim::category::laws::{
     verify_symmetric_monoidal_laws, verify_braiding_naturality
 };
 use shim::category::{
-    Category, MonoidalCategory,
-    Functor, Monad
+    Category,
+    Functor,
+    Monad
 };
 
 use std::collections::HashMap;

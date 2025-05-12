@@ -5,7 +5,6 @@ use shim::machine_learning::categorical::transformations::{StatePreparationTrans
 use shim::machine_learning::quantum::model::{DecodingStrategy, EncodingStrategy};
 use shim::machine_learning::categorical::prediction::{PredictionCategory, PredictionTransformation};
 use shim::machine_learning::dataset::TabularDataset;
-use shim::quantum::gate::*;
 use shim::quantum::circuit::*;
 use shim::quantum::state::StateVector;
 use shim::machine_learning::dataset::Dataset;
@@ -90,7 +89,7 @@ fn run_quantum_ml_showcase(
     let data_category = DataCategory;
     let circuit_category = CircuitCategory;
     let model_category = ModelCategory;
-    let prediction_category = PredictionCategory;
+    let _prediction_category = PredictionCategory;
 
     // Extract parameters for easier access
     let qubit_count = quantum_params.qubit_count;
@@ -98,7 +97,7 @@ fn run_quantum_ml_showcase(
 
     // ===== 1. Create the dataset =====
     println!("Generating dataset...");
-    let (x_data, y_data_flat, y_data, dataset, total_samples) =
+    let (x_data, y_data_flat, _y_data, dataset, total_samples) =
         create_spiral_dataset(&dataset_params);
 
     println!("Created spiral dataset with {} samples, 2 features, {} classes",
@@ -527,7 +526,7 @@ fn verify_functorial_properties(
     println!("\nDemonstrating how category theory enables formal reasoning...");
 
     // Create the component morphisms for our model
-    let prep_morphism = state_prep.prepare_state(
+    let _prep_morphism = state_prep.prepare_state(
         data_category,
         circuit_category,
         data_to_circuit,
@@ -535,7 +534,7 @@ fn verify_functorial_properties(
         &2
     );
 
-    let model_morphism = model_prediction.measure_circuit(
+    let _model_morphism = model_prediction.measure_circuit(
         circuit_category,
         model_category,
         &circuit_to_model.identity_functor(),

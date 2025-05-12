@@ -5,13 +5,12 @@
 //! quantum circuits while preserving their categorical structure.
 
 use shim::quantum::{
-    QuantumCircuit, CircuitBuilder, StandardGate,
+    QuantumCircuit, CircuitBuilder,
     transformations::{CircuitTransformer, CircuitOptimizerTransformation},
     specialized_transformations::{ErrorDetectionTransformation, ZXCalculusTransformation},
     optimizer::{CircuitOptimizer, OptimizationPattern},
 };
 use shim::quantum::QuantumCircuitTransformation;
-use std::f64::consts::PI;
 
 fn main() {
     println!("Quantum Circuit Transformations Example");

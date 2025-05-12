@@ -346,6 +346,8 @@ mod tests {
 
     #[test]
     fn test_monoidal_category_laws() {
+        //Left as is to be improved.
+
         let set_category = SetCategory;
 
         // Create some test objects
@@ -354,15 +356,15 @@ mod tests {
         let set_c = SetObject { elements: vec![5, 6] };
 
         // Test tensor product of objects
-        let ab = set_category.tensor_objects(&set_a, &set_b);
-        let bc = set_category.tensor_objects(&set_b, &set_c);
+        let _ab = set_category.tensor_objects(&set_a, &set_b);
+        let _bc = set_category.tensor_objects(&set_b, &set_c);
 
         // Test associator
-        let assoc = set_category.associator(&set_a, &set_b, &set_c);
+        let _assoc = set_category.associator(&set_a, &set_b, &set_c);
 
         // Test unitors
-        let left_unitor = set_category.left_unitor(&set_a);
-        let right_unitor = set_category.right_unitor(&set_a);
+        let _left_unitor = set_category.left_unitor(&set_a);
+        let _right_unitor = set_category.right_unitor(&set_a);
 
         // We can't easily verify the mathematical properties directly,
         // but we can at least check that these operations don't panic
@@ -378,8 +380,8 @@ mod tests {
         let set_b = SetObject { elements: vec![3, 4] };
 
         // Test braiding
-        let braiding_ab = set_category.braiding(&set_a, &set_b);
-        let braiding_ba = set_category.braiding(&set_b, &set_a);
+        let _braiding_ab = set_category.braiding(&set_a, &set_b);
+        let _braiding_ba = set_category.braiding(&set_b, &set_a);
 
         // In a proper test, we'd verify that braiding_ba ∘ braiding_ab = id
         // but we'll just check that the operations don't panic
@@ -423,10 +425,10 @@ mod tests {
         let set_a = SetObject { elements: vec![1, 2, 3] };
 
         // Test unit
-        let unit_a = monad.unit(&set_category, &set_a);
+        let _unit_a = monad.unit(&set_category, &set_a);
 
         // Test join
-        let join_a = monad.join(&set_category, &set_a);
+        let _join_a = monad.join(&set_category, &set_a);
 
         // In a proper test, we'd verify the monad laws
         // but we'll just check that the operations don't panic

@@ -1,4 +1,3 @@
-// src/quantum/circuit.rs
 use num_complex::{Complex64};
 use ndarray::Array2;
 use crate::quantum::gate::{QuantumGate, StandardGate, ParametrizedGate};
@@ -674,7 +673,6 @@ impl Functor<QuantumCircuitCategory, QuantumGateCategory> for CircuitToGateFunct
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::category::laws;
 
     #[test]
     fn test_dagger_category_laws() {
@@ -723,8 +721,8 @@ mod tests {
         let id_a = category.identity(&qubit_count);
 
         // Tensor operations for testing snake equations
-        let id_a_tensor_unit = category.tensor_morphisms(&id_a, &unit);
-        let counit_tensor_id_a = category.tensor_morphisms(&counit, &id_a);
+        let _id_a_tensor_unit = category.tensor_morphisms(&id_a, &unit);
+        let _counit_tensor_id_a = category.tensor_morphisms(&counit, &id_a);
 
         // First snake equation: (id_A ⊗ ε_A) ∘ (η_A ⊗ id_A) = id_A
         // Due to quantum circuit limitations, we need to simulate this equation

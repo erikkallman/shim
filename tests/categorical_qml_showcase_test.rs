@@ -8,9 +8,6 @@ mod tests {
     use shim::machine_learning::categorical::prediction::{PredictionCategory, PredictionTransformation};
     use shim::machine_learning::dataset::TabularDataset;
 
-
-    use shim::quantum::gate::*;
-
     use shim::quantum::circuit::*;
     use shim::quantum::state::StateVector;
 
@@ -28,7 +25,7 @@ mod tests {
         let data_category = DataCategory;
         let circuit_category = CircuitCategory;
         let model_category = ModelCategory;
-        let prediction_category = PredictionCategory;
+        let _prediction_category = PredictionCategory;
 
         // ===== 2. Create a more impressive synthetic dataset =====
         // Generate a spiral dataset for binary classification (inspired by scikit-learn's demo)
@@ -47,7 +44,7 @@ mod tests {
 
         // Generate the spiral pattern
         for i in 0..n_classes {
-            let ix = i * n_samples_per_class..(i + 1) * n_samples_per_class;
+            let _ix = i * n_samples_per_class..(i + 1) * n_samples_per_class;
             let r = Array1::linspace(0.0, 1.0, n_samples_per_class);
             let t = Array1::linspace(
                 i as f64 * 2.0 * PI / n_classes as f64,
@@ -270,7 +267,7 @@ mod tests {
         println!("\nDemonstrating how category theory enables formal reasoning...");
 
         // Create the component morphisms for our model
-        let prep_morphism = state_prep.prepare_state(
+        let _prep_morphism = state_prep.prepare_state(
             &data_category,
             &circuit_category,
             &data_to_circuit,
@@ -278,7 +275,7 @@ mod tests {
             &2
         );
 
-        let model_morphism = model_prediction.measure_circuit(
+        let _model_morphism = model_prediction.measure_circuit(
             &circuit_category,
             &model_category,
             &circuit_to_model.identity_functor(),

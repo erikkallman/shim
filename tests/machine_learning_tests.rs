@@ -311,8 +311,8 @@ fn test_data_to_model_functor() {
     let mapped_composed = data_to_model.map_morphism(&data_cat, &model_cat, &composed);
 
     // Map each morphism individually
-    let mapped_f = data_to_model.map_morphism(&data_cat, &model_cat, &f);
-    let mapped_g = data_to_model.map_morphism(&data_cat, &model_cat, &g);
+    let _mapped_f = data_to_model.map_morphism(&data_cat, &model_cat, &f);
+    let _mapped_g = data_to_model.map_morphism(&data_cat, &model_cat, &g);
 
     // Compose the mapped morphisms in ModelCategory
     // Note: This would require implementing a compose method for ModelTransformation

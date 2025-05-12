@@ -124,11 +124,11 @@ impl CompactClosedCategory for QuantumGateCategory {
     fn dual(&self, a: &Self::Object) -> Self::Object {
         *a  // Quantum systems are self-dual
     }
-    
+
     fn unit_morphism(&self, a: &Self::Object) -> Self::Morphism {
         // Create bell pairs (unit morphism): η_A: I → A* ⊗ A
         let mut circuit = QuantumCircuit::new(2 * a);
-        
+
         // Create bell pairs (maximally entangled states)
         for i in 0..*a {
             // Apply Hadamard to first qubit
@@ -136,10 +136,10 @@ impl CompactClosedCategory for QuantumGateCategory {
             // Apply CNOT with control on first qubit, target on second
             let _ = circuit.add_gate(Box::new(StandardGate::CNOT), &[i, i + a]);
         }
-        
+
         circuit_to_gate(&circuit)
     }
-    
+
     fn counit_morphism(&self, a: &Self::Object) -> Self::Morphism {
         // Bell measurement (counit morphism): ε_A: A ⊗ A* → I
         // This is the adjoint of the unit morphism
@@ -256,19 +256,19 @@ pub trait QuantumGate: Debug + Any + Send + Sync{
 
     /// Convert to mutable Any for runtime type checking
     fn as_any_mut(&mut self) -> &mut dyn Any;
-    
+
     /// Returns the adjoint (Hermitian conjugate) of this gate
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         // Default implementation: compute the adjoint matrix (conjugate transpose)
         let matrix = self.matrix();
         let mut adjoint_matrix = Array2::zeros(matrix.dim());
-        
+
         for i in 0..matrix.shape()[0] {
             for j in 0..matrix.shape()[1] {
                 adjoint_matrix[[j, i]] = matrix[[i, j]].conj();
             }
         }
-        
+
         // Create a custom gate with the adjoint matrix
         Box::new(CustomMatrixGate {
             matrix: adjoint_matrix,
@@ -276,17 +276,17 @@ pub trait QuantumGate: Debug + Any + Send + Sync{
             qubits: self.qubit_count(),
         })
     }
-    
+
     /// Compares this gate with another gate for equality
     fn equals(&self, other: &dyn QuantumGate) -> bool {
         // Default implementation compares matrices
         let m1 = self.matrix();
         let m2 = other.matrix();
-        
+
         if m1.shape() != m2.shape() {
             return false;
         }
-        
+
         // Compare matrix elements with tolerance for floating point
         for i in 0..m1.shape()[0] {
             for j in 0..m1.shape()[1] {
@@ -297,7 +297,7 @@ pub trait QuantumGate: Debug + Any + Send + Sync{
                 }
             }
         }
-        
+
         true
     }
 
@@ -593,14 +593,14 @@ impl QuantumGate for StandardGate {
     fn clone_box(&self) -> Box<dyn QuantumGate> {
         Box::new(self.clone())
     }
-    
+
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         match self {
             // Gates that are self-adjoint (Hermitian)
-            StandardGate::I(_) | StandardGate::X | StandardGate::Z | 
-            StandardGate::H | StandardGate::SWAP | StandardGate::CZ | 
+            StandardGate::I(_) | StandardGate::X | StandardGate::Z |
+            StandardGate::H | StandardGate::SWAP | StandardGate::CZ |
             StandardGate::Toffoli => self.clone_box(),
-            
+
             // Gates with specific adjoints
             StandardGate::Y => self.clone_box(), // Y is self-adjoint
             StandardGate::S => Box::new(StandardGate::S), // S† = S* (complex conjugate)
@@ -666,7 +666,7 @@ impl QuantumGate for ParametrizedGate {
     }
 
     fn matrix(&self) -> Array2<Complex64> {
-        
+
 
         match self {
             ParametrizedGate::Rx(theta) => {
@@ -775,7 +775,7 @@ impl QuantumGate for ParametrizedGate {
     fn clone_box(&self) -> Box<dyn QuantumGate> {
         Box::new(self.clone())
     }
-    
+
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         match self {
             // Rotation gates have adjoint = rotation by negative angle
@@ -849,7 +849,7 @@ impl QuantumGate for TensorProductGate {
             gate2: self.gate2.clone_box(),
         })
     }
-    
+
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         // The adjoint of a tensor product is the tensor product of adjoints
         Box::new(TensorProductGate {
@@ -899,7 +899,7 @@ impl QuantumGate for ComposedGate {
             gate2: self.gate2.clone_box(),
         })
     }
-    
+
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         // The adjoint of a composition is the reversed composition of adjoints
         // (g ∘ f)† = f† ∘ g†
@@ -978,7 +978,7 @@ impl QuantumGate for LocalizedGate {
             total_qubits: self.total_qubits,
         })
     }
-    
+
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         // The adjoint of a localized gate is the localized adjoint
         Box::new(LocalizedGate {
@@ -1050,7 +1050,7 @@ impl QuantumGate for LinearCombinationGate {
             coefficients: self.coefficients.clone(),
         })
     }
-    
+
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         // The adjoint of a linear combination is the linear combination of adjoints
         // with conjugated coefficients
@@ -1125,7 +1125,7 @@ impl QuantumGate for BraidingGate {
             b_qubits: self.b_qubits,
         })
     }
-    
+
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         // Braiding is its own adjoint (self-adjoint)
         self.clone_box()
@@ -1172,7 +1172,7 @@ impl QuantumGate for AssociatorGate {
             c_qubits: self.c_qubits,
         })
     }
-    
+
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         // Associator is its own adjoint (self-adjoint)
         self.clone_box()
@@ -1222,7 +1222,7 @@ impl QuantumGate for UnitIsomorphismGate {
             direction: self.direction,
         })
     }
-    
+
     fn adjoint(&self) -> Box<dyn QuantumGate> {
         // Unitor is its own adjoint (self-adjoint)
         self.clone_box()
@@ -1263,25 +1263,24 @@ pub fn create_swap_network(system_a_size: usize, system_b_size: usize) -> Box<dy
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::category::laws;
-    
+
     #[test]
     fn test_dagger_category_laws() {
         let category = QuantumGateCategory;
-        
+
         // Create test gates as Box<dyn QuantumGate>
         let gate_x: Box<dyn QuantumGate> = Box::new(StandardGate::X);
         let gate_h: Box<dyn QuantumGate> = Box::new(StandardGate::H);
-        let gate_z: Box<dyn QuantumGate> = Box::new(StandardGate::Z);
-        
+        let _gate_z: Box<dyn QuantumGate> = Box::new(StandardGate::Z);
+
         // Compose gates for testing
         let h_after_x = category.compose(&gate_x, &gate_h).unwrap();
-        
+
         // Verify involution: (f†)† = f
         let gate_x_dagger = category.dagger(&gate_x);
         let gate_x_dagger_dagger = category.dagger(&gate_x_dagger);
         assert!(gate_x.equals(gate_x_dagger_dagger.as_ref()));
-        
+
         // Verify contravariance: (g ∘ f)† = f† ∘ g†
         let h_after_x_dagger = category.dagger(&h_after_x);
         let gate_x_dagger = category.dagger(&gate_x);
@@ -1289,23 +1288,23 @@ mod tests {
         let x_dagger_after_h_dagger = category.compose(&gate_h_dagger, &gate_x_dagger).unwrap();
         assert!(h_after_x_dagger.equals(x_dagger_after_h_dagger.as_ref()));
     }
-    
+
     #[test]
     fn test_compact_closed_snake_equations() {
         let category = QuantumGateCategory;
-        
+
         // Test for 1 qubit
         let qubit_count = 1;
-        
+
         // Get unit morphism: η_A: I → A* ⊗ A
         let unit = category.unit_morphism(&qubit_count);
-        
+
         // Get counit morphism: ε_A: A ⊗ A* → I
         let counit = category.counit_morphism(&qubit_count);
-        
+
         // Create identity morphism on A
-        let id_a = category.identity(&qubit_count);
-        
+        let _id_a = category.identity(&qubit_count);
+
         // Test that counit is the adjoint of unit
         assert!(counit.equals(category.dagger(&unit).as_ref()));
     }

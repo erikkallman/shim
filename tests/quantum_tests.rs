@@ -420,11 +420,11 @@ mod tests {
         // Create two small circuits as builders
         let mut builder1 = CircuitBuilder::new(1);
         builder1.h(0).unwrap();
-        let circuit1 = builder1.build();
+        let _circuit1 = builder1.build();
 
         let mut builder2 = CircuitBuilder::new(1);
         builder2.x(0).unwrap();
-        let circuit2 = builder2.build();
+        let _circuit2 = builder2.build();
 
         // We need to recreate builders from the circuits
         let mut builder1 = CircuitBuilder::new(1);
