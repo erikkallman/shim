@@ -21,8 +21,26 @@ Shim has many basic structures in place but certain functions are still shell
 implementations. This is a hobby project (evening and weekend time), meaning I
 typically work with less structure and priority.
 
-That means that there is no roadmap. Im just exploring ideas and see the code
-evolve as a result of that.
+## Development Roadmap
+
+### Released
+- **v0.1.0**: Core category theory structures, basic quantum primitives
+- **v0.2.0**: StateVector simulator implementation, quantum gate definitions
+- **v0.3.0**: Circuit model with categorical composition, density matrix support
+- **v0.4.0**: Dagger compact closed category implementation, entanglement operations
+
+### Current (v0.5.0)
+- Natural transformation framework for circuit manipulation
+- Categorical representation of quantum operations
+- Extended quantum circuit transformations
+- Parametrized gates and measurement operations
+
+### Planned
+- **v0.6.0**: Noise model implementations
+- **v0.7.0**: Quantum error correction codes implementation
+- **v0.8.0**: Performance optimizations for large-scale simulations
+- **v0.9.0**: Adapter for hardware-specific backends
+- **v1.0.0**: Full categorical quantum machine learning pipeline
 
 ## Examples
 
