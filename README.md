@@ -88,7 +88,7 @@ use categorical_qc::machine_learning::categorical::*;
 Clone the repository and build:
 
 ```bash
-git clone https://github.com/yourusername/shim.git
+git clone https://github.com/erikkallman/shim.git
 cd shim
 cargo build
 ```

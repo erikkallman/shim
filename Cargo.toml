@@ -3,7 +3,7 @@ name = "shim"
 version = "0.1.0"
 edition = "2021"
 authors = ["Erik Källman <erik.kallman@gmail.com>"]
-description = "A categorical quantum machine learning framework in Rust"
+description = "A categorical quantum computing framework in Rust"
 
 
 [dependencies]
