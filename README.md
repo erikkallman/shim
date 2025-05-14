@@ -72,7 +72,7 @@ To use Shim in your project, add it to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-categorical_qc = { git = "https://github.com/yourusername/shim.git" }
+categorical_qc = { git = "https://github.com/erikkallman/shim.git" }
 ```
 
 Then import the necessary modules:
