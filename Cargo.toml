@@ -1,0 +1,19 @@
+[package]
+name = "shim"
+version = "0.1.0"
+edition = "2021"
+authors = ["Erik Källman <erik.kallman@gmail.com>"]
+description = "A categorical quantum computing framework in Rust"
+
+
+[dependencies]
+num-complex = "0.4"
+ndarray = "0.15"
+rand = "0.8"
+rayon = "1.5"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+
+[lib]
+name = "shim"
+path = "src/lib.rs"
